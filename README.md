@@ -1,6 +1,7 @@
 # OperationResearchApp
 
 Kitchen Manager App for Operational Research Class
+Menedżer Kuchenny na Badania Operacyjne 2
 
 ## Notes
 
