@@ -47,7 +47,7 @@ def save_file(json_obj):
 	date_for_filename = str(datetime.datetime.utcnow())
 	date_for_filename = date_for_filename.split(' ')[1]
 	date_for_filename = date_for_filename.split('.')[0]
-	date_for_filename = date_for_filename.replace(':', )
+	date_for_filename = date_for_filename.replace(':', '_')
 
 	with open(f'generated_data/{date_for_filename}.json', 'w') as file:
 		file.write(json_obj)
