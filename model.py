@@ -129,7 +129,7 @@ class Model:
 	def _generate_new(self, nbrhd_type: NeighborhoodType, vec: np.ndarray) -> np.ndarray:
 		raise NotImplementedError
 		
-	def generate_new_neighborhood(self, nbrhd_type: NeighborhoodType, vec: np.ndarray, size: int) -> np.ndarray:
+	def generate_new_neighborhood(self, nbrhd_type: NeighborhoodType, vec: np.ndarray) -> np.ndarray:
 		raise NotImplementedError
 	
 	def calculate_cost_function(self, vec: np.ndarray) -> float:
