@@ -105,11 +105,9 @@ class Model:
 
 		# algorythm stuff
 		#self.global_best: EvaluatedSolution
-		self.global_best: Tuple[np.ndarray, float]
+		self.global_best: Tuple[int, float]
 		self.iteration_limit: int
 		self.aspiration_coefficient: float
-
-		self.best_X_sequence: np.ndarray = np.array([])
 
 		
 	def taboo_search(self, max_iterations: int, nbrhd_type: NeighborhoodType, \
