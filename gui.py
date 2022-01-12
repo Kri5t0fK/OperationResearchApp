@@ -3,10 +3,9 @@ from numpy.core.fromnumeric import size
 import gui_data
 import numpy as np
 import matplotlib.pyplot as plt
+
 # needed for graph in gui:
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-
 
 
 def redraw_graph():
@@ -28,6 +27,7 @@ def redraw_graph():
 def load_file():
     #TODO: file loading
     sg.popup("File loaded!", font="Helvetica 13")
+	
 
 def generate_initial_solution():
     #TODO: initial solution
@@ -38,7 +38,7 @@ def run_optimisation():
     sg.popup("Solution optimised!")
 
 
-def main():
+def main(window):
 
     while True:
         event, values = window.read()
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     ax_graph = fig_graph.add_subplot(111)
     figure_canvas_agg = FigureCanvasTkAgg(fig_graph, window['_gui.canvas'].TKCanvas)
     figure_canvas_agg.get_tk_widget().pack(side='top', fill='both', expand=1)
-    main()
+    main(window)
