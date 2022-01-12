@@ -112,6 +112,10 @@ class Model:
 		self.best_X_sequence: np.ndarray = np.array([])
 
 		
+	def taboo_search(self, max_iterations: int, nbrhd_type: NeighborhoodType, \
+				ssm_type: SolutionSelectrionMethod, cutoff: float, nbrhd_size: int) -> Tuple[float, int]:
+		raise NotImplementedError
+
 	def load_data(self, filepath: Path) -> None:
 		raise NotImplementedError
 		
