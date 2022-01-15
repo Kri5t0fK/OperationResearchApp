@@ -187,8 +187,8 @@ class Model:
 		return self.params @ cost
 
 
-	def determine_is_product_expired(self, size: int) -> bool:
-		return self._E[size] > self.today
+	def determine_is_product_expired(self, idx: int) -> bool:
+		return self._E[idx] < self.today + 1
 
 
 	def random_recipe_idx(self) -> int:
