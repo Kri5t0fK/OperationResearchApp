@@ -105,13 +105,13 @@ class Model:
 		self.recipe_count: int						# target recipe count (length of _X)
 		self.initial_X: Tuple[float, np.ndarray]	# [cost_function_val, _X]
 		#self.global_best: EvaluatedSolution
-		self.global_best: Tuple[int, float]
+		self.global_best_X: Tuple[int, float, np.ndarray]	# [iteration, cost_function_val, _X]
 		self.iteration_limit: int
 		self.aspiration_coefficient: float
 		self.tabu_age: np.ndarray = np.array([0, 0, 0])	# [short, medium, long]
 
 		# cost function stuff
-		self.params: np.ndarray = np.array([0.0, 0.0, 0.0])
+		self.params: np.ndarray = np.array([0.0, 0.0, 0.0])	# [alpha, beta, gamma]
 
 		random.seed() # seed the random number generator with system time (pretty random)
 
@@ -123,7 +123,7 @@ class Model:
 
 	def load_data(self, filepath: Path) -> None:
 		if not filepath.exists():
-			raise ValueError('File doesn\'t exsist')
+			raise ValueError('File doesn\'t exist')
 		
 		with filepath.open() as json_f:
 			model_data = json.load(json_f)
@@ -131,7 +131,9 @@ class Model:
 			self._N_Rec = model_data['n']
 			self._N_Ing = model_data['m']
 
+			#TODO: add [today] to data_file (so that solution is only dependant on the data_file)
 			self.today = 1
+			#TODO: implement [money] restriction in neighborhood generation
 			self.money = model_data['money']
 
 			self._R = model_data['recipies']
@@ -141,8 +143,8 @@ class Model:
 			self._P = model_data['prices']
 
 
-	def set_params(self, a: float, b: float, g:float) -> None:
-		self.params = np.array([a, b, g])
+	def set_params(self, alpha: float, beta: float, gamma:float) -> None:
+		self.params = np.array([alpha, beta, gamma])
 
 
 	def set_tabu_age(self, short: int, medium: int, long: int) -> None:
@@ -195,10 +197,11 @@ class Model:
 		# TODO: check out random.shuffle(x) -> shuffles list `x` randomly
 		return random.randrange(start=0, stop=self._N_Rec, step=1)
 
+	"""probably won't be used
 	def random_bool(self) -> bool:
 		rand_int = random.randrange(start=0, stop=100, step=1)
 		return rand_int < 50 # true if less than 50, false if greater
-
+	"""
 
 	@staticmethod
 	def max(a, b):
