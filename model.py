@@ -110,6 +110,9 @@ class Model:
 		# cost function stuff
 		self.params: np.ndarray = np.array([0.0, 0.0, 0.0])	# [alpha, beta, gamma]
 
+		# data for gui graph of cost_function
+		self.graph_data: np.ndarray[np.ndarray, np.ndarray]	# [current_cost, best_cost]
+
 		random.seed() # seed the random number generator with system time (pretty random)
 
 		
@@ -119,6 +122,9 @@ class Model:
 		tabu_list_short: np.ndarray = np.array([], dtype=int)
 		self.global_best_X = (0, self.initial_X[0], self.initial_X[1].copy())	# best solution
 		self._X = (self.initial_X[0], self.initial_X[1].copy())					# current solution
+
+		# initialize graph data
+		self.graph_data = np.array([[self.initial_X[0]], [self.initial_X[0]]])
 
 		iteration: int = 1
 		while iteration < max_iterations:
@@ -177,6 +183,9 @@ class Model:
 
 			# apply new neighbor as current solution
 			self._X = (new_neighbor_cost, new_neighbor.copy())
+
+			# add data to graph
+			self.graph_data = np.append(self.graph_data, [[new_neighbor_cost], [self.global_best_X[1]]], 1)
 
 			iteration += 1
 
