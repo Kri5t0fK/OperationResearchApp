@@ -55,24 +55,25 @@ class EvaluatedSolution(NamedTuple):
 	value: float
 """
 
+"""
 class TabuList:
 
 	def __init__(self):
 		self._list: np.ndarray = np.array([])
 
 	def contains(self, idx: int) -> bool:
-		raise NotImplementedError
+		return idx in self._list
 
-	def add(self, idx: int) -> None:
+	def append(self, idx: int) -> None:
 		# add just recipe-idx, that shouldn't be chosen
-		raise NotImplementedError
+		self._list = np.append(self._list, [idx])
 
-	def remove(self, idx: int) -> None:
-		raise NotImplementedError
+	def pop(self, idx: int) -> None:
+		self._list = np.delete(self._list, 0)
 
 	def at(self, idx: int) -> bool:
 		raise NotImplementedError
-
+"""
 
 class Model:
 	
