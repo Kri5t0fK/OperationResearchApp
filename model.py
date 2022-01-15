@@ -155,11 +155,43 @@ class Model:
 		self.initial_X = np.array([self.calculate_cost_function(new_X), new_X])
 
 
-	def generate_new(self, nbrhd_type: NeighborhoodType, vec: np.ndarray) -> np.ndarray:
-		raise NotImplementedError
+	def generate_new(self, vec: np.ndarray, nbrhd_hamming: NeighborhoodType) -> np.ndarray:
+		nbrhd_hamming = nbrhd_hamming.value
+		new_vec: np.ndarray = vec.copy()
+		aux_used_recipes: np.ndarray = np.array([])	# prevents duplication
+		vec_idxs: np.ndarray = np.array([i for i in range(vec.size)])
+		if nbrhd_hamming == 0:
+			nbrhd_hamming = random.randrange(start=1, stop=7, step=1)
+		if nbrhd_hamming > vec.size:
+			nbrhd_hamming = vec.size
+		
+		for i in range(nbrhd_hamming):
+			# pick idx in vec to change
+			idx1 = random.choice(vec_idxs)
+			vec_idxs = np.setdiff1d(vec_idxs, idx1)	# remove idx, so it cannot be changed again
+
+			# add recipe from [idx1] to [aux_used_recipes]
+			aux_used_recipes = np.append(aux_used_recipes, [vec[idx1]])
+
+			# pick new recipe to place in [idx1]
+			new_recipe = random.randrange(start=0, stop=self._N_Rec, step=1)
+			if i == 0:	# ensure at least 1 changed recipe
+				while new_recipe in vec:
+					new_recipe = random.randrange(start=0, stop=self._N_Rec, step=1)
+			else:
+				while new_recipe in aux_used_recipes:
+					new_recipe = random.randrange(start=0, stop=self._N_Rec, step=1)
+			
+			# mark [new_recipe] as already used, so it cannot duplicate
+			aux_used_recipes = np.append(aux_used_recipes, [new_recipe])
+			
+			if new_recipe not in vec:
+				new_vec[idx1] = new_recipe	# replace recipe in [idx1] with [new_recipe]
+
+		return new_vec
 
 
-	def generate_new_neighborhood(self, nbrhd_type: NeighborhoodType, vec: np.ndarray) -> np.ndarray:
+	def generate_new_neighborhood(self, vec: np.ndarray, nbrhd_hamming: NeighborhoodType) -> np.ndarray:
 		raise NotImplementedError
 
 
