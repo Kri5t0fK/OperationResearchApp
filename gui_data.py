@@ -11,7 +11,7 @@ frame_parameters = [
     sg.Column([
         [sg.Text("Recipe count:", size=(10, 1)), sg.Input("6", key="_gui.input.recipe_count", size=(6, 1))],
         [sg.Text("Max iterations:", size=(10, 1)), sg.Input("100", key="_gui.input.max_iter", size=(6, 1))],
-        [sg.Text("Taboo size:", size=(10, 1)), sg.Input("10", key="_gui.input.taboo_size", size=(6, 1))]
+        [sg.Text("Tabu size:", size=(10, 1)), sg.Input("10", key="_gui.input.tabu_size", size=(6, 1))]
     ])]
 ]
 

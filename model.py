@@ -67,7 +67,7 @@ class EvaluatedSolution(NamedTuple):
 	value: float
 """
 
-class TabooList:
+class TabuList:
 
 	def __init__(self):
 		self._list: np.ndarray = np.array([])
@@ -113,7 +113,7 @@ class Model:
 		self.global_best: Tuple[int, float]
 		self.iteration_limit: int
 		self.aspiration_coefficient: float
-		self.taboo_age: np.ndarray = np.array([0, 0, 0])
+		self.tabu_age: np.ndarray = np.array([0, 0, 0])	# [short, medium, long]
 
 		# cost function stuff
 		self.params: np.ndarray = np.array([0.0, 0.0, 0.0])
@@ -121,7 +121,7 @@ class Model:
 		random.seed() # seed the random number generator with system time (pretty random)
 
 		
-	def taboo_search(self, max_iterations: int, nbrhd_type: NeighborhoodType, \
+	def tabu_search(self, max_iterations: int, nbrhd_type: NeighborhoodType, \
 				ssm_type: SolutionSelectrionMethod, cutoff: float, nbrhd_size: int) -> Tuple[float, int]:
 		raise NotImplementedError
 
@@ -150,8 +150,8 @@ class Model:
 		self.params = np.array([a, b, g])
 
 
-	def set_taboo_age(self, short: int, medium: int, long: int) -> None:
-		self.taboo_age = np.array([short, medium, long])
+	def set_tabu_age(self, short: int, medium: int, long: int) -> None:
+		self.tabu_age = np.array([short, medium, long])
 
 
 	def generate_initial(self) -> np.ndarray: # TODO: optimize it (vectorization could work)
