@@ -12,27 +12,21 @@ import numpy as np
 @unique
 class NeighborhoodType(Enum):
 	
-	RAND = 1
-	HAM2 = 2,
-	HAM3 = 3,
+	RAND = 0
+	HAM1 = 1
+	HAM2 = 2
+	HAM3 = 3
 	HAM4 = 4
+	HAM5 = 5
+	HAM6 = 6
 
 	def __str__(self) -> str:
-		
-		s = 'none'
-
-		if self.value == self.RAND:
-			s = 'Random'
-		elif self.value == self.HAM2:
-			s = 'Hamming 2'
-		elif self.value == self.HAM3:
-			s = 'Hamming 3'
-		elif self.value == self.HAM4:
-			s = 'Hamming 4'
+		if self.value == self.RAND.value:
+			return 'Random'
+		elif self.value > self.RAND.value:
+			return f'Hamming {self.value}'
 		else:
-			s = 'None'
-		
-		return s
+			return 'None'
 
 
 @unique
@@ -42,9 +36,9 @@ class SolutionSelectrionMethod(Enum):
 	RANDOM = 2
 
 	def __str__(self) -> str:
-		if self.value == self.BEST:
+		if self.value == self.BEST.value:
 			return 'Best'
-		elif self.value == self.RANDOM:
+		elif self.value == self.RANDOM.value:
 			return 'Random'
 		else:
 			return 'None'
