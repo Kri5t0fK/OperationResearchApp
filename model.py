@@ -3,7 +3,7 @@
 """
 from pathlib import Path # universal Path
 from enum import Enum, unique # helpful
-from typing import NamedTuple, Tuple # code visibility
+from typing import NamedTuple, Tuple, List # code visibility
 import random # generating initial solutions
 import json # data parsing
 
@@ -30,7 +30,7 @@ class NeighborhoodType(Enum):
 
 
 @unique
-class SolutionSelectrionMethod(Enum):
+class SolutionSelectionMethod(Enum):
 
 	BEST = 1,
 	RANDOM = 2
@@ -90,7 +90,8 @@ class Model:
 		self._Q: np.ndarray = np.array([])
 		self._E: np.ndarray = np.array([])
 		self._P: np.ndarray = np.array([])
-		self._X: np.ndarray = np.array([])	# current X (solution), stores selected R_IDXs (vec of ints, not bools)
+		# [cost_function, current X (solution)], stores selected R_IDXs (vec of ints, not bools)
+		self._X: Tuple[float, np.ndarray]
 
 		# problem dimensions R: N_Rec x N_Ing
 		self._N_Rec: int = 0	# N_Rec -> number of recipies
@@ -103,7 +104,7 @@ class Model:
 		self.global_best_X: Tuple[int, float, np.ndarray]	# [iteration, cost_function_val, _X]
 		self.iteration_limit: int
 		self.neighborhood_size: int
-		self.aspiration_coefficient: float
+		self.aspiration_coeff: float
 		self.tabu_age: np.ndarray = np.array([0, 0, 0])	# [short, medium, long]
 
 		# cost function stuff
@@ -112,9 +113,74 @@ class Model:
 		random.seed() # seed the random number generator with system time (pretty random)
 
 		
-	def tabu_search(self, max_iterations: int, nbrhd_type: NeighborhoodType, \
-				ssm_type: SolutionSelectrionMethod, cutoff: float, nbrhd_size: int) -> Tuple[float, int]:
-		raise NotImplementedError
+	def tabu_search(self, max_iterations: int, nbrhd_hamming: NeighborhoodType, \
+				ssm_type: SolutionSelectionMethod, cutoff: float, nbrhd_size: int) -> Tuple[int, float, np.ndarray]:
+		
+		tabu_list_short: np.ndarray = np.array([], dtype=int)
+		self.global_best_X = (0, self.initial_X[0], self.initial_X[1].copy())	# best solution
+		self._X = (self.initial_X[0], self.initial_X[1].copy())					# current solution
+
+		iteration: int = 1
+		while iteration < max_iterations:
+			neighborhood: np.ndarray = self.generate_new_neighborhood(self._X[1], nbrhd_hamming)
+
+			# pick only neighbors [not forbidden by Tabu] or [meeting aspiration]
+			neighborhood_eligible: np.ndarray = np.array([[]])
+			for candidate in neighborhood:
+				# check Tabu eligibility
+				eligible: bool = True
+				for recipe in candidate:
+					if recipe in tabu_list_short:
+						eligible = False
+
+				# aspiration check
+				if not eligible:
+					if self.calculate_cost_function(candidate) < self.aspiration_coeff * self.global_best_X[1]:
+						eligible = True
+				
+				# add to eligible neighborhood
+				if eligible:
+					if neighborhood_eligible.size == 0:
+						neighborhood_eligible = np.append(neighborhood_eligible, [candidate], 1)
+					else:
+						neighborhood_eligible = np.append(neighborhood_eligible, [candidate], 0)
+			
+			#TODO: what if neighborhood_eligible empty? pick from [tabu_medium]? - for now forces "bad/forbidden" solution
+			if neighborhood_eligible.size == 0:
+				neighborhood_eligible = np.append(neighborhood_eligible, [neighborhood[0]], 1)
+
+			# select new neighbor
+			new_neighbor: np.ndarray = neighborhood_eligible[0]
+			if ssm_type == SolutionSelectionMethod.RANDOM:
+				# randomly
+				new_neighbor = random.choice(neighborhood_eligible)
+			elif ssm_type == SolutionSelectionMethod.BEST:
+				# best
+				new_neighbor_cost: float = self.calculate_cost_function(new_neighbor)
+				for candidate in neighborhood_eligible:
+					candidate_cost: float = self.calculate_cost_function(candidate)
+					if candidate_cost < new_neighbor_cost:
+						new_neighbor = candidate
+						new_neighbor_cost = candidate_cost
+			
+			# check if new best
+			new_neighbor_cost: float = self.calculate_cost_function(new_neighbor)
+			if new_neighbor_cost < self.global_best_X[1]:
+				self.global_best_X = (iteration, new_neighbor_cost, new_neighbor.copy())
+			
+			# add to tabu_list_short
+			old_recipes = np.setdiff1d(self._X[1], new_neighbor)
+			tabu_list_short = np.append(tabu_list_short, old_recipes)
+			# pop oldest from tabu_list_short
+			while tabu_list_short.size > self.tabu_age[0]:
+				tabu_list_short = np.delete(tabu_list_short, 0)
+
+			# apply new neighbor as current solution
+			self._X = (new_neighbor_cost, new_neighbor.copy())
+
+			iteration += 1
+
+		return self.global_best_X
 
 
 	def load_data(self, filepath: Path) -> None:
@@ -194,11 +260,12 @@ class Model:
 
 
 	def generate_new_neighborhood(self, vec: np.ndarray, nbrhd_hamming: NeighborhoodType) -> np.ndarray:
+		#TODO: maybe change to np.ndarray[np.ndarray]
 		neighborhood: List[np.ndarray] = []
 		for _ in range(self.neighborhood_size):
 			# generete new neighbor that is not [already in list]/[== vec]
 			new_neighbor: np.ndarray = self.generate_new(vec, nbrhd_hamming)
-			while array_in_list(new_neighbor, neighborhood) or np.array_equal(new_neighbor, vec):
+			while self.array_in_list(new_neighbor, neighborhood) or np.array_equal(new_neighbor, vec):
 				new_neighbor = self.generate_new(vec, nbrhd_hamming)
 			
 			# add to neighborhood
@@ -220,9 +287,9 @@ class Model:
 		# calc Shop & Loss costs
 		for i in range(self._N_Ing):
 			#TODO: maybe write the [q_need[i]-self._Q[i]] to aux var and then determine to which cost to add
-			cost[0] += self._P[i] * max(0, q_need[i] - self._Q[i])
+			cost[0] += self._P[i] * self.max(0, q_need[i] - self._Q[i])
 			if self.determine_is_product_expired(i):
-				cost[1] += self._P[i] * max(0, self._Q[i] - q_need[i])
+				cost[1] += self._P[i] * self.max(0, self._Q[i] - q_need[i])
 
 		return self.params @ cost
 
