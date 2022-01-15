@@ -48,12 +48,6 @@ class SolutionSelectrionMethod(Enum):
 			return 'Random'
 		else:
 			return 'None'
-
-
-@unique
-class Move(Enum):
-	ONE_ZERO = 0,
-	ZERO_ONE = 1
 	
 
 class CostFunctionParams(NamedTuple):
@@ -75,7 +69,8 @@ class TabuList:
 	def contains(self, idx: int) -> bool:
 		raise NotImplementedError
 
-	def add(self, idx: int, mv: Move) -> None:
+	def add(self, idx: int) -> None:
+		# add just recipe-idx, that shouldn't be chosen
 		raise NotImplementedError
 
 	def remove(self, idx: int) -> None:
