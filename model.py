@@ -207,11 +207,11 @@ class Model:
 			#TODO: implement [money] restriction in neighborhood generation
 			self.money = model_data['money']
 
-			self._R = model_data['recipies']
-			self._T = model_data['times']
-			self._Q = model_data['quantities']
-			self._E = model_data['dates']
-			self._P = model_data['prices']
+			self._R = np.array(model_data['recipes'])
+			self._T = np.array(model_data['times'])
+			self._Q = np.array(model_data['quantities'])
+			self._E = np.array(model_data['dates'])
+			self._P = np.array(model_data['prices'])
 
 
 	def set_params(self, alpha: float, beta: float, gamma:float) -> None:
@@ -229,7 +229,7 @@ class Model:
 			while curr_recipe in new_X:
 				curr_recipe = self.random_recipe_idx()
 			new_X = np.append(new_X, [curr_recipe])
-		self.initial_X = np.array([self.calculate_cost_function(new_X), new_X])
+		self.initial_X = (self.calculate_cost_function(new_X), new_X)
 
 
 	def generate_new(self, vec: np.ndarray, nbrhd_hamming: NeighborhoodType) -> np.ndarray:
@@ -283,7 +283,7 @@ class Model:
 		return np.array(neighborhood)
 
 
-	def calculate_cost_function(self, vec_X: np.ndarray) -> float:
+	def calculate_cost_function(self, vec_X: np.ndarray, split_mode: bool = False) -> float:
 		cost: np.ndarray = np.array([0.0, 0.0, 0.0]) # Shop, Loss, Time
 		q_need: np.ndarray = np.zeros(self._N_Ing) # needed quantity of each Ingredient
 
@@ -291,7 +291,7 @@ class Model:
 		for j in vec_X:
 			cost[2] += self._T[j]	# add _R[j]'s time to Time-cost
 			for i in range(self._N_Ing):
-				q_need += self._R[j, i]	# calc need for each Ingredient
+				q_need[i] += self._R[j, i]	# calc need for each Ingredient
 		
 		# calc Shop & Loss costs
 		for i in range(self._N_Ing):
@@ -299,8 +299,11 @@ class Model:
 			cost[0] += self._P[i] * self.max(0, q_need[i] - self._Q[i])
 			if self.determine_is_product_expired(i):
 				cost[1] += self._P[i] * self.max(0, self._Q[i] - q_need[i])
-
-		return self.params @ cost
+		
+		if split_mode:
+			return cost
+		else:
+			return self.params @ cost
 
 
 	def determine_is_product_expired(self, idx: int) -> bool:
