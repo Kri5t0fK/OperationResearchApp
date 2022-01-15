@@ -101,6 +101,7 @@ class Model:
 		#self.global_best: EvaluatedSolution
 		self.global_best_X: Tuple[int, float, np.ndarray]	# [iteration, cost_function_val, _X]
 		self.iteration_limit: int
+		self.neighborhood_size: int
 		self.aspiration_coefficient: float
 		self.tabu_age: np.ndarray = np.array([0, 0, 0])	# [short, medium, long]
 
@@ -174,7 +175,7 @@ class Model:
 			aux_used_recipes = np.append(aux_used_recipes, [vec[idx1]])
 
 			# pick new recipe to place in [idx1]
-			new_recipe = random.randrange(start=0, stop=self._N_Rec, step=1)
+			new_recipe: int = random.randrange(start=0, stop=self._N_Rec, step=1)
 			if i == 0:	# ensure at least 1 changed recipe
 				while new_recipe in vec:
 					new_recipe = random.randrange(start=0, stop=self._N_Rec, step=1)
@@ -192,7 +193,17 @@ class Model:
 
 
 	def generate_new_neighborhood(self, vec: np.ndarray, nbrhd_hamming: NeighborhoodType) -> np.ndarray:
-		raise NotImplementedError
+		neighborhood: List[np.ndarray] = []
+		for _ in range(self.neighborhood_size):
+			# generete new neighbor that is not [already in list]/[== vec]
+			new_neighbor: np.ndarray = self.generate_new(vec, nbrhd_hamming)
+			while array_in_list(new_neighbor, neighborhood) or np.array_equal(new_neighbor, vec):
+				new_neighbor = self.generate_new(vec, nbrhd_hamming)
+			
+			# add to neighborhood
+			neighborhood.append(new_neighbor)
+
+		return np.array(neighborhood)
 
 
 	def calculate_cost_function(self, vec_X: np.ndarray) -> float:
@@ -234,3 +245,9 @@ class Model:
 		if a > b:
 			return a
 		return b
+
+
+	# check if [array] in [list of arrays]
+	@staticmethod
+	def array_in_list(array: np.ndarray, array_list: List):
+		return next((True for elem in array_list if np.array_equal(elem, array)), False)
