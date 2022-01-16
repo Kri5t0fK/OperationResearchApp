@@ -2,7 +2,7 @@ import random
 import datetime
 import json
 
-quantities = [100, 200, 300, 400, 500]
+quantities = [0, 100, 200, 300]
 
 
 def generate_prices(m: int):
@@ -31,7 +31,9 @@ def generate_recipes(n: int, m: int):
     for i in range(n):
         nl = []
         for j in range(m):
-            nl.append(random.randint(100, 199))
+            aux = random.randint(-50, 10)
+            aux = 0 if aux<0 else aux
+            nl.append(aux)
         l.append(nl)
     return f'"recipes": {json.dumps(l)},'
 
