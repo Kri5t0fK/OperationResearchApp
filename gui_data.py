@@ -1,7 +1,20 @@
 import PySimpleGUI as sg
 from model import NeighborhoodType, SolutionSelectionMethod
 
-# Frame with parameters - inputs
+"""Frame with parameters (
+ - alpha
+ - beta
+ - gamma
+ - neighbourhood_type (list)
+ - neighbourhood_size
+ - recipe_count 
+ - max_iterations
+ - tabu_size
+ - solution_selection_method (list)
+ - min_cutoff
+ - aspiration_coeff
+ )
+"""
 frame_parameters = [
     [sg.Column([
         [sg.Text("alpha (Expenses):", size=(14, 1)), sg.Input("1", key="_gui.input.alpha", size=(6, 1))],
@@ -22,7 +35,13 @@ frame_parameters = [
     ])]
 ]
 
-# Frame with initial solution - outputs
+
+"""Frame with initial solution output (
+ - cost function value
+ - solution (selected products' indices in a list)
+ - cost function decomposition into: expenses, losses and time of prep
+ )
+"""
 frame_initial_output = [
     [sg.Column([
         [sg.Text("Initial solution:", size=(10, 1)), sg.Input("##", key="_gui.output.init_solution", size=(12, 1), disabled=True)],
@@ -35,7 +54,13 @@ frame_initial_output = [
     ]
 ]
 
-# Frame with optimised solution - outputs
+
+"""Frame with final (suboptimal) solution output (
+ - cost function value
+ - solution (selected products' indices in a list)
+ - cost function decomposition into: expenses, losses and time of prep
+ )
+"""
 frame_optimised_output = [
     [sg.Column([
         [sg.Text("Best solution:", size=(10, 1)), sg.Input("##", key="_gui.output.best_solution", size=(12, 1), disabled=True)]
@@ -53,7 +78,17 @@ frame_optimised_output = [
     ]
 ]
 
-# Column with inputs & outputs
+
+"""Column (File input, Optimization Parameters, Initial solution output, optimization output)
+
+File input (
+ - file selection textbox
+ - file selection button
+ - file loading button
+ )
+
+Optimization parameters (frame with parameters)
+"""
 col_in_out = [
     [sg.Text("Input & Output")],
     [sg.Text("Load file with Kitchen Data (Recipes, Ingredients, Prices, etc.):")],
@@ -66,13 +101,18 @@ col_in_out = [
     [sg.Button("Exit", key="_gui.exit")]
 ]
 
-# Column with graph
+
+"""Column (Cost function graph)
+
+Cost function graph (x - iteration, y - solution(x))
+
+"""
 col_graph = [
     [sg.Text("Cost Function Graph")],
     [sg.Canvas(key="_gui.canvas")]
 ]
 
-# Full layout
+"""Layout (Column with file input, parameters and output, Column with graph)"""
 layout = [
     [sg.Column(col_in_out), sg.VSeparator(), sg.Column(col_graph)]
 ]
