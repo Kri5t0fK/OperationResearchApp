@@ -97,8 +97,7 @@ class Model:
 		random.seed() # seed the random number generator with system time (pretty random, random enough)
 
 		
-	def tabu_search(self, max_iterations: int, nbrhd_hamming: NeighborhoodType, \
-				ssm_type: SolutionSelectionMethod) -> int:
+	def tabu_search(self, max_iterations: int, nbrhd_hamming: NeighborhoodType, ssm_type: SolutionSelectionMethod) -> int:
 		"""Taboo Search implementation for Model
 		
 		This implementation 
