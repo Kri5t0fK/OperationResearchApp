@@ -2,7 +2,7 @@ import random
 import datetime
 import json
 
-quantities = [0, 100, 200, 300]
+quantities = [0, 100, 200, 300] # quantities describe discrete product amounts
 
 
 def generate_prices(m: int):
@@ -55,10 +55,10 @@ def save_file(json_obj):
 		file.write(json_obj)
 
 
-def generate_solutions():
-	random.seed(420)
-	n = 20
-	m = 50
+def generate_model():
+	random.seed()
+	n = 500000
+	m = 100
 	money = 1000
 
 	json_object = '{' \
@@ -75,5 +75,5 @@ def generate_solutions():
 	save_file(json_object)
 
 if __name__ == "__main__":
-    generate_solutions()
+    generate_model()
 	
