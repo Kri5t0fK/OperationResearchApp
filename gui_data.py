@@ -63,12 +63,12 @@ col_in_out = [
     [sg.Text("")],
     [sg.Frame(title='Initial Solution - Output', layout=frame_initial_output, relief=sg.RELIEF_SUNKEN, tooltip='Use these to set flags')],
     [sg.Frame(title='Optimised Solution - Output', layout=frame_optimised_output, relief=sg.RELIEF_SUNKEN, tooltip='Use these to set flags')],
-    [sg.Button("Exit", key="_gui.exit"), sg.Button("DEBUG Redraw!", key="_gui.draw")]
+    [sg.Button("Exit", key="_gui.exit")]
 ]
 
 # Column with graph
 col_graph = [
-    [sg.Text("Graph")],
+    [sg.Text("Cost Function Graph")],
     [sg.Canvas(key="_gui.canvas")]
 ]
 
