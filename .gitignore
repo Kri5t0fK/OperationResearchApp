@@ -1,4 +1,5 @@
 venv
 sample_data/*
 __pycache__
-
+generated_data/*
+.idea

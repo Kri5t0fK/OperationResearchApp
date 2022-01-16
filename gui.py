@@ -1,21 +1,19 @@
 from pathlib import Path
 from typing import Dict
-import PySimpleGUI as sg
-import gui_data
+
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # graph in the ui
+import PySimpleGUI as sg
+
+import gui_data
 import model
 
-# needed for graph in gui:
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-
-def redraw_graph():
+def redraw_graph() -> None:
     # clear axis
     ax_graph.cla()
 
-    # TEST PLOT DATA
-    #TODO: plot ObjectiveFunction history here
     graph_data: np.ndarray = model_obj.graph_data
 
     # make fig and plot
@@ -23,11 +21,11 @@ def redraw_graph():
     ax_graph.plot(graph_data[1], '--g')
     ax_graph.grid()
     ax_graph.set_xlim([0, model_obj.iteration_limit])
-    # Instead of plt.show
-    figure_canvas_agg.draw()
 
+	# Instead of plt.show
+    figure_canvas_agg.draw()	
 
-def load_file(window: sg.Window, vals: Dict):
+def load_file(window: sg.Window, vals: Dict) -> None:
     path = vals["_gui.input.file"]
     if path:
         path: Path = Path(path)
@@ -38,7 +36,7 @@ def load_file(window: sg.Window, vals: Dict):
         sg.popup("Enter path!")
 	
 
-def pass_params_to_model(window: sg.Window, vals: Dict):
+def pass_params_to_model(window: sg.Window, vals: Dict) -> None:
     alpha = float(vals['_gui.input.alpha'])
     beta = float(vals['_gui.input.beta'])
     gamma = float(vals['_gui.input.gamma'])
@@ -49,11 +47,9 @@ def pass_params_to_model(window: sg.Window, vals: Dict):
     model_obj.tabu_age[0] = int(vals['_gui.input.tabu_size'])
     model_obj.cutoff = float(vals['_gui.input.min_cutoff'])
     model_obj.aspiration_coeff = float(vals['_gui.input.aspiration_coeff'])
-    return
 
 
-def generate_initial_solution(window: sg.Window, vals: Dict):
-    #TODO: initial solution
+def generate_initial_solution(window: sg.Window, vals: Dict) -> None:
     pass_params_to_model(window, vals)
     model_obj.recipe_count = int(vals['_gui.input.recipe_count'])
     model_obj.generate_initial()
@@ -70,8 +66,7 @@ def generate_initial_solution(window: sg.Window, vals: Dict):
     
     sg.popup("Initial solution generated!")
     
-def run_optimisation(window: sg.Window, vals: Dict):
-    #TODO: run optimisation
+def run_optimisation(window: sg.Window, vals: Dict) -> None:
     pass_params_to_model(window, vals)
     nbrhd_type = vals['_gui.input.nbrhd_type']
     solution_selection = vals['_gui.input.solution_select']
@@ -110,6 +105,7 @@ if __name__ == "__main__":
     # Window creation
     window: sg.Window = sg.Window(title="Kitchen Manager GUI", layout=gui_data.layout, finalize=True)
 
+	# Data model initialization
     model_obj = model.Model()
 
     # Graph setting (init)
