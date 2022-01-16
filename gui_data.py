@@ -13,7 +13,7 @@ frame_parameters = [
     ]),
     sg.VSeparator(),
     sg.Column([
-        [sg.Text("Recipe count:", size=(13, 1)), sg.Input("3", key="_gui.input.recipe_count", size=(6, 1))],
+        [sg.Text("Recipe count:", size=(13, 1)), sg.Input("6", key="_gui.input.recipe_count", size=(6, 1))],
         [sg.Text("Max iterations:", size=(13, 1)), sg.Input("100", key="_gui.input.max_iter", size=(6, 1))],
         [sg.Text("Tabu size:", size=(13, 1)), sg.Input("10", key="_gui.input.tabu_size", size=(6, 1))],
         [sg.Text("Solution selection:", size=(13, 1)), sg.Spin([i for i in SolutionSelectionMethod], key="_gui.input.solution_select", initial_value=SolutionSelectionMethod(1), size=(8, 1))],
