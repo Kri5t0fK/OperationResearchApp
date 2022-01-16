@@ -33,6 +33,7 @@ class NeighborhoodType(Enum):
 class SolutionSelectionMethod(Enum):
 
 	BEST = 1,
+	BEST = 1
 	RANDOM = 2
 
 	def __str__(self) -> str:
@@ -103,6 +104,7 @@ class Model:
 		#self.global_best: EvaluatedSolution
 		self.global_best_X: Tuple[int, float, np.ndarray]	# [iteration, cost_function_val, _X]
 		self.iteration_limit: int
+		self.cutoff: int						# stop when under that value
 		self.neighborhood_size: int
 		self.aspiration_coeff: float
 		self.tabu_age: np.ndarray = np.array([0, 0, 0])	# [short, medium, long]
@@ -117,7 +119,7 @@ class Model:
 
 		
 	def tabu_search(self, max_iterations: int, nbrhd_hamming: NeighborhoodType, \
-				ssm_type: SolutionSelectionMethod, cutoff: float, nbrhd_size: int) -> Tuple[int, float, np.ndarray]:
+				ssm_type: SolutionSelectionMethod) -> Tuple[int, float, np.ndarray]:
 		
 		tabu_list_short: np.ndarray = np.array([], dtype=int)
 		self.global_best_X = (0, self.initial_X[0], self.initial_X[1].copy())	# best solution
@@ -186,6 +188,10 @@ class Model:
 
 			# add data to graph
 			self.graph_data = np.append(self.graph_data, [[new_neighbor_cost], [self.global_best_X[1]]], 1)
+
+			# cutoff stop condition
+			if new_neighbor_cost < self.cutoff:
+				break
 
 			iteration += 1
 
