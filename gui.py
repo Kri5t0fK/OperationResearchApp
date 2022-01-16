@@ -102,8 +102,6 @@ def main(window: sg.Window):
             generate_initial_solution(window, values)
         elif event == "_gui.optimise":
             run_optimisation(window, values)
-        elif event == "_gui.draw":
-            redraw_graph()
 
     window.close()
 
