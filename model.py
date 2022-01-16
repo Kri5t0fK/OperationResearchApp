@@ -24,7 +24,7 @@ class NeighborhoodType(Enum):
 		if self.value == self.RAND.value:
 			return 'Random'
 		elif self.value > self.RAND.value:
-			return f'Hamming {self.value}'
+			return f'Ham{self.value}'
 		else:
 			return 'None'
 
@@ -32,7 +32,6 @@ class NeighborhoodType(Enum):
 @unique
 class SolutionSelectionMethod(Enum):
 
-	BEST = 1,
 	BEST = 1
 	RANDOM = 2
 
@@ -119,7 +118,7 @@ class Model:
 
 		
 	def tabu_search(self, max_iterations: int, nbrhd_hamming: NeighborhoodType, \
-				ssm_type: SolutionSelectionMethod) -> Tuple[int, float, np.ndarray]:
+				ssm_type: SolutionSelectionMethod) -> int:
 		
 		tabu_list_short: np.ndarray = np.array([], dtype=int)
 		self.global_best_X = (0, self.initial_X[0], self.initial_X[1].copy())	# best solution
@@ -133,7 +132,7 @@ class Model:
 			neighborhood: np.ndarray = self.generate_new_neighborhood(self._X[1], nbrhd_hamming)
 
 			# pick only neighbors [not forbidden by Tabu] or [meeting aspiration]
-			neighborhood_eligible: np.ndarray = np.array([[]])
+			neighborhood_eligible: np.ndarray = np.array([[]], dtype=int)
 			for candidate in neighborhood:
 				# check Tabu eligibility
 				eligible: bool = True
@@ -195,7 +194,7 @@ class Model:
 
 			iteration += 1
 
-		return self.global_best_X
+		return iteration
 
 
 	def load_data(self, filepath: Path) -> None:
@@ -241,8 +240,8 @@ class Model:
 	def generate_new(self, vec: np.ndarray, nbrhd_hamming: NeighborhoodType) -> np.ndarray:
 		nbrhd_hamming = nbrhd_hamming.value
 		new_vec: np.ndarray = vec.copy()
-		aux_used_recipes: np.ndarray = np.array([])	# prevents duplication
-		vec_idxs: np.ndarray = np.array([i for i in range(vec.size)])
+		aux_used_recipes: np.ndarray = np.array([], dtype=int)	# prevents duplication
+		vec_idxs: np.ndarray = np.array([i for i in range(vec.size)], dtype=int)
 		if nbrhd_hamming == 0:
 			nbrhd_hamming = random.randrange(start=1, stop=7, step=1)
 		if nbrhd_hamming > vec.size:
